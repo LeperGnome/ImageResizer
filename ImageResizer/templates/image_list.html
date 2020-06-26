@@ -1,0 +1,8 @@
+<h3>List of images: </h3>
+{% for entry in entries_list %}
+<i><b>Image: </i></b> {{entry.id}}
+{% endfor %}
+
+<form action="/upload/" method="get">
+    <input type="submit" value="Upload new image" />
+</form>

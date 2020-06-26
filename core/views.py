@@ -5,10 +5,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
 
-@api_view()
+@api_view(['GET'])
 def list_images(request):
     images = Image.objects.all()
-    return Response(data=images)
+    return render(request, 'image_list.html', {'entries_list': images})
 
 
 @api_view()
