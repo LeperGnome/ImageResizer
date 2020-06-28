@@ -1,6 +1,6 @@
 <h3>List of images: </h3>
 {% for entry in entries_list %}
-<i><b>Image: </i></b> {{entry.id}}
+<p><b>Image: </b>{{entry.name}}</p>
 {% endfor %}
 
 <form action="/upload/" method="get">
