@@ -37,7 +37,7 @@ class Upload(APIView):
             if img_url:  # if image is uploaded by url
                 # adding image saving to celery queue
                 save_image_by_url.delay(img_url)
-                return Response(data={'detail': 'Image is uplading'})
+                return Response(data={'detail': 'Image is uploading'})
 
             elif img_file:  # if image is uploaded by file
                 img_object = Image(img_file=img_file)
