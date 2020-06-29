@@ -1,6 +1,7 @@
 from core.models import Image
 from core.forms import UploadForm
 from core.tasks import save_image_by_url
+from django.http import Http404
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -9,6 +10,7 @@ from rest_framework.response import Response
 
 upload_template = 'image_upload.html'
 list_template = 'image_list.html'
+image_view_template = 'image_view.html'
 
 
 @api_view(['GET'])
@@ -18,8 +20,14 @@ def list_images(request):
 
 
 @api_view(['GET'])
-def get_image(request):
-    pass
+def get_image(request, pk):
+    image = Image.objects.get_or_none(pk=pk)
+    #
+    # TODO: display images correctly
+    #
+    if not image:
+        raise Http404
+    return render(request, image_view_template, {'image': image})
 
 
 class Upload(APIView):

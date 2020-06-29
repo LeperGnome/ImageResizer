@@ -129,6 +129,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 UPLOADS_URL = 'uploads/'
+MEDIA_ROOT = os.path.join(BASE_DIR, UPLOADS_URL)
+MEDIA_URL = UPLOADS_URL
 
 # REDIS related settings
 REDIS_HOST = 'localhost'
