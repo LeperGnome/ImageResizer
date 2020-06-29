@@ -2,6 +2,6 @@ db.sqlite3
 ImageResizer/secret
 __pycache__
 *.swp
-uploads/
+media/
 venv/
 */migrations/*

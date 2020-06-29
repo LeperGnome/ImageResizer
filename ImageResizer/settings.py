@@ -128,9 +128,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
-UPLOADS_URL = 'uploads/'
-MEDIA_ROOT = os.path.join(BASE_DIR, UPLOADS_URL)
-MEDIA_URL = UPLOADS_URL
+UPLOADS_LOCATION = 'media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, UPLOADS_LOCATION)
+MEDIA_URL = '/media/'
+
 
 # REDIS related settings
 REDIS_HOST = 'localhost'
