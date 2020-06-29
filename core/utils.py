@@ -5,9 +5,40 @@ import requests
 from io import BytesIO
 
 
-def pil_to_django(image) -> ContentFile:
+class file_counter(object):
+    def __init__(self):
+        self.position = self.size = 0
+
+    def seek(self, offset, whence=0):
+        if whence == 1:
+            offset += self.position
+        elif whence == 2:
+            offset += self.size
+        self.position = min(offset, self.size)
+
+    def tell(self):
+        return self.position
+
+    def write(self, string):
+        self.position += len(string)
+        self.size = max(self.size, self.position)
+
+
+def optimal_quality(im, size, guess=70, subsampling=1, low=1, high=100):
+    while low < high:
+        counter = file_counter()
+        im.save(counter, format='JPEG', subsampling=subsampling, quality=guess)
+        if counter.size < size:
+            low = guess
+        else:
+            high = guess - 1
+        guess = (low + high + 1) // 2
+    return low
+
+
+def pil_to_django(image, quality=100, subsampling=1) -> ContentFile:
     img_io = BytesIO()
-    image.save(img_io, format='JPEG')
+    image.save(img_io, format='JPEG', quality=quality, subsampling=subsampling)
     img_file = ContentFile(img_io.getvalue())
     return img_file
 
@@ -40,17 +71,22 @@ def get_resized_image(image, width, height, size):
         return image
 
     # looking for cached image
-    cached_image = ResizedImage.objects.filter(
-        base=image, width=width, height=height, size__lte=size)
-    if cached_image:
-        return cached_image[0]
+    cached_images = ResizedImage.objects.filter(
+        base=image, width=width, height=height, size=size)
+    if cached_images:
+        return cached_images.order_by('-size')[0]
 
     # performing resize
     pil_image = PIL.Image.open(image.img_file.path)
     resized_image = pil_image.resize(size=(width, height))
+    django_image = pil_to_django(resized_image)
+
+    # quality reduction to fit size
+    if django_image.size >= size:
+        quality = optimal_quality(resized_image, size)
+        django_image = pil_to_django(resized_image, quality=quality)
 
     # saving new image
-    django_image = pil_to_django(resized_image)
     new_resized_image = ResizedImage(
         base=image,
         width=width,
