@@ -1,5 +1,5 @@
 from django.core.files.base import ContentFile
-import time
+from core.models import Image, ResizedImage
 import PIL
 import requests
 from io import BytesIO
@@ -16,5 +16,9 @@ def retrieve_image(url: str) -> ContentFile:
     return img_file
 
 
-def generate_image_name() -> str:
-    return f'image_{time.time()}'
+def get_resized_image(image, width, height, size):
+    #
+    # TODO: look for cached images with given parameters
+    #       -> create new one and save if none found
+    #
+    return image

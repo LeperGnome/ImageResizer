@@ -1,7 +1,7 @@
 from core.models import Image
 from core.forms import UploadForm
 from core.tasks import save_image_by_url
-from django.http import Http404
+from core.utils import get_resized_image
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -21,9 +21,13 @@ def list_images(request):
 
 @api_view(['GET'])
 def get_image(request, pk):
-    image = Image.objects.get_or_none(pk=pk)
-    if not image:
-        raise Http404
+    image = Image.objects.get_or_404(pk=pk)
+    accept_params = ['width', 'height', 'size']
+    resize_params = {par: request.GET.get(par, None)
+                     for par in accept_params}
+    if any(list(resize_params.values())):
+        image = get_resized_image(image, **resize_params)
+
     return render(request, image_view_template, {'image': image})
 
 

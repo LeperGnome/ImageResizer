@@ -1,5 +1,5 @@
-from core.models import Image
-from core.utils import retrieve_image, generate_image_name
+from core.models import Image, generate_image_name
+from core.utils import retrieve_image
 from ImageResizer.celery import app
 
 
