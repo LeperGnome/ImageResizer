@@ -22,9 +22,6 @@ def list_images(request):
 @api_view(['GET'])
 def get_image(request, pk):
     image = Image.objects.get_or_none(pk=pk)
-    #
-    # TODO: display images correctly
-    #
     if not image:
         raise Http404
     return render(request, image_view_template, {'image': image})

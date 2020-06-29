@@ -5,10 +5,10 @@ from django.core.exceptions import ValidationError
 class UploadForm(forms.Form):
     url = forms.URLField(
         max_length=1023,
-        label="Image URL",
+        label="From URL: ",
         required=False
     )
-    img_file = forms.ImageField(label="Upload from file", required=False)
+    img_file = forms.ImageField(label="From file: ", required=False)
 
     def clean(self):
         cleaned_data = super().clean()

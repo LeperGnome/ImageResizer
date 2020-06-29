@@ -5,7 +5,7 @@ import requests
 from io import BytesIO
 
 
-def retrieve_image(url):
+def retrieve_image(url: str) -> ContentFile:
     content = BytesIO(requests.get(url).content)
 
     img = PIL.Image.open(content)
@@ -16,5 +16,5 @@ def retrieve_image(url):
     return img_file
 
 
-def generate_image_name():
+def generate_image_name() -> str:
     return f'image_{time.time()}'
