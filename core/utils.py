@@ -91,7 +91,7 @@ def get_resized_image(image, width, height, size):
         base=image,
         width=width,
         height=height,
-        size=django_image.size
+        size=image.img_file.size
     )
     new_resized_image.img_file.save(
         content=django_image, name=generate_image_name())

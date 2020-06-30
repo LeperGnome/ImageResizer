@@ -2,6 +2,7 @@ from core.models import Image
 from core.forms import UploadForm, ViewImageForm
 from core.tasks import save_image_by_url
 from core.utils import get_resized_image
+from django.contrib import messages
 from django.shortcuts import render, redirect
 from rest_framework.views import APIView
 from rest_framework.decorators import api_view
@@ -21,15 +22,18 @@ def list_images(request):
 
 @api_view(['GET'])
 def get_image(request, pk):
-    image = Image.objects.get_or_404(pk=pk)
-    accept_params = ['width', 'height', 'size']
-    resize_params = {par: request.GET.get(par, None)
-                     for par in accept_params}
-    if any(list(resize_params.values())):
-        image = get_resized_image(image, **resize_params)
+    form = ViewImageForm(request.GET)
+
+    if form.is_valid():
+        image = Image.objects.get_or_404(pk=pk)
+        accept_params = ['width', 'height', 'size']
+        resize_params = {par: request.GET.get(par, None)
+                         for par in accept_params}
+        if any(list(resize_params.values())):
+            image = get_resized_image(image, **resize_params)
 
     return render(request, image_view_template,
-                  {'image': image, 'form': ViewImageForm})
+                  {'image': image, 'form': form})
 
 
 class Upload(APIView):
@@ -47,12 +51,14 @@ class Upload(APIView):
             if img_url:  # if image is uploaded by url
                 # adding image saving to celery queue
                 save_image_by_url.delay(img_url)
-                return Response(data={'detail': 'Image is uploading'})
+                messages.success(request, "Image is uploading")
 
             elif img_file:  # if image is uploaded by file
                 img_object = Image(img_file=img_file)
                 img_object.save()
-                return Response(data={'detail': 'Image uploaded'})
+                messages.success(request, "Image uploaded")
+
+            return render(request, upload_template, {'form': form})
 
         else:
             return render(

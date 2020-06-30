@@ -34,5 +34,5 @@ class ResizedImage(models.Model):
     img_file = models.ImageField()
     width = models.IntegerField()
     height = models.IntegerField()
-    size = models.IntegerField()
+    size = models.IntegerField()   # not real image size
     objects = ObjectManager()

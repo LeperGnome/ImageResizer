@@ -1,9 +1,13 @@
 <html>
     <head>
         <style>
-.errorlist {
-    color: red;
+.messages {
+    list-style: None;
+    color: blue;
 }
+            .errorlist {
+                color: red;
+            }
         </style>
 
         <!-- Required meta tags -->
@@ -18,6 +22,14 @@
     <body>
         <div align="center">
             <h3>Upload image</h3>
+
+            {% if messages %}
+            <ul class="messages">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
 
             <form enctype="multipart/form-data" action="/upload/" method="post">
                 {% csrf_token %}
