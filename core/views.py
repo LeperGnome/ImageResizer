@@ -1,5 +1,5 @@
 from core.models import Image
-from core.forms import UploadForm
+from core.forms import UploadForm, ViewImageForm
 from core.tasks import save_image_by_url
 from core.utils import get_resized_image
 from django.shortcuts import render, redirect
@@ -28,7 +28,8 @@ def get_image(request, pk):
     if any(list(resize_params.values())):
         image = get_resized_image(image, **resize_params)
 
-    return render(request, image_view_template, {'image': image})
+    return render(request, image_view_template,
+                  {'image': image, 'form': ViewImageForm})
 
 
 class Upload(APIView):

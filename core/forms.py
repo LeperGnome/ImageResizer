@@ -2,13 +2,21 @@ from django import forms
 from django.core.exceptions import ValidationError
 
 
+class ViewImageForm(forms.Form):
+    height = forms.IntegerField(
+        max_value=10000, min_value=0, required=False)
+    width = forms.IntegerField(
+        max_value=10000, min_value=0, required=False)
+    size = forms.IntegerField(min_value=0, required=False)
+
+
 class UploadForm(forms.Form):
     url = forms.URLField(
         max_length=1023,
-        label="From URL: ",
+        label="From URL",
         required=False
     )
-    img_file = forms.ImageField(label="From file: ", required=False)
+    img_file = forms.ImageField(label="From file", required=False)
 
     def clean(self):
         cleaned_data = super().clean()
