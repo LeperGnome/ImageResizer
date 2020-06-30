@@ -24,7 +24,23 @@ class file_counter(object):
         self.size = max(self.size, self.position)
 
 
-def optimal_quality(im, size, guess=70, subsampling=1, low=1, high=100):
+def optimal_quality(im, size, guess=100, subsampling=1, low=1, high=100) -> int:
+    '''
+    Binary search algorithm for finding optimal quality compression rate 
+    in order to suit maximum size. If desired size is not achived 
+    that returns closest possible 
+
+    Args:
+        im: (PIL.Image) image object
+        size: (int) desired size in bytes
+        guess: (int) number of guesses
+        subsampling: (int) subsampling rate
+        low: (int) lowest acceptable quality
+        high: (int) highest acceptable quality
+
+    Returns:
+        int - most suitable quality (or lowest if desired size is not achieved)
+    '''
     while low < high:
         counter = file_counter()
         im.save(counter, format='JPEG', subsampling=subsampling, quality=guess)
@@ -37,6 +53,17 @@ def optimal_quality(im, size, guess=70, subsampling=1, low=1, high=100):
 
 
 def pil_to_django(image, quality=100, subsampling=1) -> ContentFile:
+    '''
+    Converts PIL image to django ContentFile
+
+    Args:
+        image: (PIL.Image)
+        quality: (int) compression rate (100 returns original)
+        subsampling: (int) subsampling rate
+
+    Returns:
+        Image as ContentFile
+    '''
     img_io = BytesIO()
     image.save(img_io, format='JPEG', quality=quality, subsampling=subsampling)
     img_file = ContentFile(img_io.getvalue())
@@ -44,18 +71,46 @@ def pil_to_django(image, quality=100, subsampling=1) -> ContentFile:
 
 
 def retrieve_image(url: str) -> ContentFile:
+    '''
+    Downloads image and returns django ContentFile
+
+    Args:
+        url: image url
+
+    Returns:
+        Image as ContentFile
+
+    Raises:
+        different connection errors
+    '''
     content = BytesIO(requests.get(url).content)
     img = PIL.Image.open(content)
     return pil_to_django(img)
 
 
 def get_resized_image(image, width, height, size):
+    '''
+    Resizes incoming image to resolution (width, height) and compresses to (size).
+    Functions uses cached images (ResizedImage) to not generate identical images.
+    If desired size in unachievable - size sets to be lowest possible
+    If size is not set, ResizedImage will contain size of original image, 
+    even if ResizedImage actuall size is different
+
+    Args:
+        image: (core.models.Image) Image model object
+        width: (int) width to set
+        heigth: (int) heigth to set
+        size:(int) size in bytes to compress to
+
+    Returns:
+        Image or ResizedImage - objects of django models. 
+        Image is returned when all parameters suit original image
+        ResizedImage is returned otherwise
+    '''
     def int_or_default(param, param_string):
         default = getattr(image.img_file, param_string)
         try:
             param = int(param)
-            if param <= 0:
-                param = default
         except:
             param = default
         return param
@@ -91,7 +146,7 @@ def get_resized_image(image, width, height, size):
         base=image,
         width=width,
         height=height,
-        size=image.img_file.size
+        size=size
     )
     new_resized_image.img_file.save(
         content=django_image, name=generate_image_name())

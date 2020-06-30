@@ -22,10 +22,9 @@ def list_images(request):
 
 @api_view(['GET'])
 def get_image(request, pk):
+    image = Image.objects.get_or_404(pk=pk)
     form = ViewImageForm(request.GET)
-
     if form.is_valid():
-        image = Image.objects.get_or_404(pk=pk)
         accept_params = ['width', 'height', 'size']
         resize_params = {par: request.GET.get(par, None)
                          for par in accept_params}

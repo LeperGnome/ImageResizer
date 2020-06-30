@@ -10,6 +10,9 @@
 form {
     margin: 20;
 }
+            .errorlist {
+                color: red;
+            }
         </style>
 
         <title>View image</title>
@@ -18,7 +21,9 @@ form {
 
         <div align=center>
             <form action="." method="get">
-                {{form}}
+                <table style="border: 10px solid transparent">
+                    {{form}}
+                </table>
                 <input type="submit" value="Resize">
             </form>
 
